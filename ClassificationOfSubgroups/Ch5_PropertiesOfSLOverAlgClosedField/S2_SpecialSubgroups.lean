@@ -517,16 +517,28 @@ lemma neg_mem_D_iff_mem_D {F : Type*} [Field F] {x : SL(2,F)} : -x ∈ D F  ↔ 
     simp
 
 lemma D_sup_closure_w_eq_DW {F : Type*} [Field F] : DW F = (D F) ⊔ Subgroup.closure {w} := by
+  rw [sup_eq_closure_mul]
   apply le_antisymm
-  · rintro x (⟨δ, rfl⟩ | ⟨δ, hδ⟩)
-    · rw [sup_eq_closure_mul, mem_closure]
-      intro K hK
-      have d_mem_mul : d δ ∈ (D F).carrier * (Subgroup.closure {w}).carrier := by
-        rw [Set.mem_mul]
-        sorry
-      sorry
-    · sorry
-  · sorry
+  · rintro x (⟨δ, rfl⟩ | ⟨δ, rfl⟩) <;> rw [mem_closure] <;> intro K hK <;>
+    apply hK <;> rw [Set.mem_mul] <;> use d δ <;> simp
+  · intro x hx
+    rw [mem_closure] at hx
+    apply hx; rintro y ⟨_, ⟨δ, rfl⟩, w', hw', rfl⟩
+    rw [← zpowers_eq_closure] at hw'
+    rcases mem_zpowers_iff.mp hw' with ⟨k, rfl⟩
+    have hw4 : (w : SL(2,F)) ^ (4 : ℤ) = 1 := by
+      show w ^ (4 : ℕ) = 1
+      simp [pow_succ, pow_zero, w_mul_w_eq_neg_one]
+    have hk : (w : SL(2,F)) ^ k = w ^ (k % 4) := by
+      conv_lhs => rw [← Int.emod_add_mul_ediv k 4]
+      rw [zpow_add, zpow_mul, hw4, one_zpow, mul_one]
+    have : k % 4 = 0 ∨ k % 4 = 1 ∨ k % 4 = 2 ∨ k % 4 = 3 := by omega
+    rcases this with (h | h | h | h) <;> simp only [h, hk]
+    · simp; left; use δ
+    · simp; right; use δ
+    · rw [zpow_two, w_mul_w_eq_neg_one]; left; use -δ; simp
+    · rw [show (3 : ℤ) = 2 + 1 by norm_num, zpow_add, zpow_two, zpow_one, w_mul_w_eq_neg_one]
+      right; use -δ; simp
 
 
 section Center
