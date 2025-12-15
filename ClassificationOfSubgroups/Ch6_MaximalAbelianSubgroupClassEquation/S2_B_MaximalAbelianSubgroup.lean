@@ -162,7 +162,8 @@ theorem exists_IsCyclic_K_normalizer_eq_Q_join_K {F : Type*} [Field F] { p : ℕ
   (G : Subgroup SL(2,F))
   (Q : Sylow p G)
   (h : Q.toSubgroup ≠ ⊥) :
-  ∃ K : Subgroup G, IsCyclic K ∧ normalizer Q.toSubgroup = Q.toSubgroup ⊔ K := by sorry
+  ∃ K : Subgroup G, IsCyclic K ∧ normalizer Q.toSubgroup = Q.toSubgroup ⊔ K := by
+  sorry
 
 /-
 Theorem 2.3 (v b)If |K| > |Z|, then K ∈ M.

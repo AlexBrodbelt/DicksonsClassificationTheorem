@@ -19,6 +19,7 @@ open Matrix MatrixGroups Subgroup MulAut MaximalAbelianSubgroup Pointwise Specia
 def Subgroup.noncenter {G : Type*} [Group G] (H : Subgroup G) : Set G :=
   H.carrier \ center G
 
+
 theorem Subgroup.mem_noncenter {G : Type*} [Group G] {H : Subgroup G} {x : G} :
   x ∈ H.noncenter ↔ x ∈ H ∧ x ∉ center G := by
   simp [Subgroup.noncenter, Set.mem_diff, SetLike.mem_coe]
@@ -27,22 +28,22 @@ theorem Subgroup.mem_noncenter {G : Type*} [Group G] {H : Subgroup G} {x : G} :
 Definition. The set $\mathcal{C}(A) = Cl(A) = \{x A x^{-1} \; | \; x ∈ G \}$
 is called the conjugacy class of $A \in \mathcal{M}$.
 -/
-def ConjClassOfSet {F : Type*} [Field F] (G : Subgroup SL(2,F))
-  (A : MaximalAbelianSubgroupsOf G)  :=
+def ConjClassOf {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) :=
   { conj x • A.val | x ∈ G }
 
 /- let M∗ be the set of all Aᵢ* and let Cᵢ* be the conjugacy class of Aᵢ* .-/
 def noncenter_MaximalAbelianSubgroupsOf {F : Type*} [Field F] (G : Subgroup SL(2,F)) :=
   { noncenter (K : Subgroup SL(2,F)) | K ∈ MaximalAbelianSubgroupsOf G }
 
-def noncenter_ConjClassOfSet {F : Type*} [Field F] (G : Subgroup SL(2,F))
+def noncenter_ConjClassOf {F : Type*} [Field F] (G : Subgroup SL(2,F))
   (A : noncenter_MaximalAbelianSubgroupsOf G)  :=
   { conj x • A.val | x ∈ G }
 
 
-noncomputable def card_noncenter_ConjClassOfSet {F : Type*} [Field F]
+noncomputable def card_noncenter_ConjClassOf {F : Type*} [Field F]
   (G : Subgroup SL(2,F)) : noncenter_MaximalAbelianSubgroupsOf G → ℕ :=
-  fun A => Nat.card (noncenter_ConjClassOfSet G A)
+  fun A => Nat.card (noncenter_ConjClassOf G A)
 
 section noncenter_MaximalAbelianSubgroupsOf
 
@@ -94,7 +95,8 @@ def union_conj_noncenter_MaximalAbelianSubgroupsOf {F : Type*} [Field F]
   noncenter_MaximalAbelianSubgroupsOf G → Set SL(2,F) :=
     fun A => ⋃ x ∈ G, conj x • A.val
 
-lemma noncenter_C_eq_of_related {F : Type*} [Field F] (G : Subgroup SL(2,F)) [Finite G] :
+
+lemma union_conj_noncenter_eq_of_related {F : Type*} [Field F] (G : Subgroup SL(2,F)) [Finite G] :
  (∀ (A B : (noncenter_MaximalAbelianSubgroupsOf G)),
   A ≈ B → union_conj_noncenter_MaximalAbelianSubgroupsOf G A =
      union_conj_noncenter_MaximalAbelianSubgroupsOf G B) := by
@@ -122,7 +124,8 @@ lemma noncenter_C_eq_of_related {F : Type*} [Field F] (G : Subgroup SL(2,F)) [Fi
 def lift_union_conj_noncenter_MaximalAbelianSubgroupsOf {F : Type*} [Field F]
   (G : Subgroup SL(2,F)) [Finite G] :=
   @Quotient.lift _ _ (s := lift_noncenter_MaximalAbelianSubgroupsOf G)
-    (f := union_conj_noncenter_MaximalAbelianSubgroupsOf G) (noncenter_C_eq_of_related G)
+    (f := union_conj_noncenter_MaximalAbelianSubgroupsOf G) (union_conj_noncenter_eq_of_related G)
+
 
 
 
@@ -237,7 +240,7 @@ noncomputable def lift_card_noncenter {F : Type*} [Field F] (G : Subgroup SL(2,F
 
 def toConjClassOfSet {F : Type*} [Field F]
   (G : Subgroup SL(2,F)) [Finite G] : noncenter_MaximalAbelianSubgroupsOf G → Set (Set SL(2,F)) :=
-  fun A => noncenter_ConjClassOfSet G A
+  fun A => noncenter_ConjClassOf G A
 
 lemma conj_noncenter_eq_noncenter_conj {F : Type*} [Field F] {G :Subgroup SL(2,F)}
   (A : MaximalAbelianSubgroupsOf G) (x : SL(2,F)) :
@@ -285,7 +288,7 @@ lemma toConjClassOfSet_eq_of_related_noncenter_subgroups {F : Type*} [Field F]
     A ≈ B → toConjClassOfSet G A = toConjClassOfSet G B) := by
   intro A B ArB
   obtain ⟨x, x_in_G, hx⟩ := ArB
-  simp [toConjClassOfSet, noncenter_ConjClassOfSet]
+  simp [toConjClassOfSet, noncenter_ConjClassOf]
   ext s
   constructor
   · rintro ⟨y, y_in_G, rfl⟩
@@ -299,7 +302,6 @@ lemma toConjClassOfSet_eq_of_related_noncenter_subgroups {F : Type*} [Field F]
     rw [MonoidHom.map_mul, MulAction.mul_smul, smul_left_cancel_iff]
     exact ⟨Subgroup.mul_mem G y_in_G x_in_G, rfl⟩
 
--- conj_noncenter_eq_noncenter_conj A x
 
 def lift_ConjClassOfSet {F : Type*} [Field F] (G : Subgroup SL(2,F)) [Finite G] :=
   @Quotient.lift _ _ (s := lift_noncenter_MaximalAbelianSubgroupsOf G) (f := toConjClassOfSet G)
@@ -588,7 +590,6 @@ We compute the cardinality of the noncenter conjugacy class
 -/
 -- noncomputable def card_noncenter_C {F : Type*} [Field F] (G : Subgroup SL(2,F)) [Finite G] :
 --  noncenter_MaximalAbelianSubgroupsOf G → ℕ := fun A => Nat.card (noncenter_C G A)
-
 /-
 We have the relation $|C(A^*)| = |A^*| |\mathcal{C}(A^*)|$
 -/
@@ -596,7 +597,14 @@ lemma card_noncenter_C_eq_noncenter_MaximalAbelianSubgroup_mul_noncenter_ConjCla
   {F : Type*} [hF : Field F] (G : Subgroup SL(2,F)) [hG : Finite G]
   (A : noncenter_MaximalAbelianSubgroupsOf G) :
   Nat.card (union_conj_noncenter_MaximalAbelianSubgroupsOf G A) =
-    Nat.card A * card_noncenter_ConjClassOfSet G A := by
+    Nat.card A * card_noncenter_ConjClassOf G A := by
+  dsimp [union_conj_noncenter_MaximalAbelianSubgroupsOf]
+  have card_A_eq_card_conj_A (A : noncenter_MaximalAbelianSubgroupsOf G) (c : SL(2,F)) :
+    Nat.card A.val = Nat.card (conj c • A.val :) := by simp
+  -- rw [Set.Finite.ncard_biUnion]
+
+
+
   sorry
 
 #check Group.nat_card_center_add_sum_card_noncenter_eq_card
@@ -622,9 +630,7 @@ lemma card_noncenter_C_eq_noncenter_MaximalAbelianSubgroup_mul_noncenter_ConjCla
 --     rw [_root_.map_mul, ← smul_smul]
 --     exact z_in_conj_g_A
 
--- noncomputable def lift_card_noncenter_C {F : Type*} [Field F] (G : Subgroup SL(2,F)) [Finite G] :=
---   @Quotient.lift _ _ (s := lift_noncenter_MaximalAbelianSubgroupsOf G)
---   (f := card_noncenter_C G) (card_noncenter_C_eq_of_related G)
+
 
 #check Setoid.isPartition_classes
 
@@ -639,7 +645,7 @@ We have the relation $|C_i^*| = |A_i^*| |\mathcal{C}_i^*|$
 lemma card_noncenter_C_eq_card_A_mul_card_noncenter_ConjClass {F : Type*} [Field F]
   (G : Subgroup SL(2,F)) [Finite G]  (A : noncenter_MaximalAbelianSubgroupsOf G) :
   Nat.card (union_conj_noncenter_MaximalAbelianSubgroupsOf G A) =
-    Nat.card A * card_noncenter_ConjClassOfSet G A := by
+    Nat.card A * card_noncenter_ConjClassOf G A := by
   sorry
 
 /- $G \setminus Z(\textrm{SL}_2(F)) = \bigcup_{A \in \mathcal{M}} (C A)^*$ -/
@@ -649,26 +655,172 @@ lemma subgroup_sdiff_center_eq_union_noncenter_C {F : Type*} [Field F] (G : Subg
 
 
 
+def ConjClassOf_to_noncenter_ConjClassOf {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) : (ConjClassOf G A) → (noncenter_ConjClassOf G (
+      ⟨noncenter A, noncenter_mem_noncenter_MaximalAbelianSubgroupsOf G A⟩)) :=
+  fun conj_A => ⟨
+    conj_A.val.noncenter,
+    by
+    obtain ⟨c, c_mem_G, conj_A_eq⟩ := conj_A.prop
+    use c, c_mem_G
+    rw [← conj_noncenter_eq_noncenter_conj, ← conj_A_eq]
+  ⟩
+
+open Function
+
+#check Set.image_union
+#check Set.union_diff_cancel
+
+instance semiring {X : Type*} : Semiring (Set X) where
+  add s t := Set.union s t
+  add_assoc s t r := Set.union_assoc _ _ _
+  zero := ⊥
+  zero_add s := Set.empty_union _
+  add_zero := Set.union_empty
+  nsmul n s := sorry --⋃₀ i : Fin n, s
+  add_comm := Set.union_comm
+  mul s t := Set.inter s t
+  left_distrib := Set.inter_union_distrib_left
+  right_distrib := Set.union_inter_distrib_right
+  zero_mul := Set.empty_inter
+  mul_zero := Set.inter_empty
+  mul_assoc := Set.inter_assoc
+  one := ⊤
+  one_mul := Set.univ_inter
+  mul_one := Set.inter_univ
+  nsmul_zero := sorry
+  nsmul_succ := sorry
+
+
+lemma conj_subgroup_eq_conj_center_union_conj_noncenter {G : Type*} [Group G] (H : Subgroup G)
+  (c : G) : (conj c • H : Set G)
+    = (conj c • H.noncenter : Set G) ∪ (conj c • (center G ⊓ H) : Set G) := by
+  unfold noncenter
+  rw [← Set.image_smul, ← Set.image_smul, ← Set.image_smul, ← Set.image_union,
+  Set.union_comm]
+  congr
+  rw [← Set.diff_self_inter, Set.inter_comm, show H.carrier = (H : Set G) by rfl]
+  simp only [coe_inf]
+  rw [Set.union_diff_cancel (Set.inter_subset_right)]
+
+
+lemma mem_coe_conj_iff_conj_coe {G : Type*} [Group G] (H : Subgroup G) (c x : G) :
+    x ∈ conj c • H ↔ x ∈ (conj c • H : Set G) := by rfl
+
+-- For Mathlib
+instance instNormalCenterInf {G : Type*} [Group G] {H : Subgroup G} : Normal (center G ⊓ H) := by
+  sorry
+
+-- For Mathlib
+lemma subset_of_union_eq_of_disjoint {G : Type*} (A B C : Set G) (hA : Disjoint A C)
+  (h : A ∪ C = B ∪ C) : A ⊆ B := by
+  intro a a_mem_A
+  have a_mem_B_union_C : a ∈ B ∪ C := by
+    rw [← h]
+    exact Set.mem_union_left C a_mem_A
+  suffices a ∉ C by
+    rw [Set.mem_union] at a_mem_B_union_C
+    grind
+  have A_inter_C_eq_empty : A ∩ C = ∅ := Disjoint.inter_eq hA
+  intro a_mem_C
+  have contr : a ∈ (∅ : Set G) := by rw [← A_inter_C_eq_empty]; grind
+  contradiction
+
+
+-- For Mathlib
+lemma eq_iff_union_eq_of_disjoint {G : Type*} (A B C: Set G) (hA : Disjoint A C)
+  (hB : Disjoint B C) : A ∪ C = B ∪ C ↔ A = B := by
+  constructor
+  · intro h
+    apply subset_antisymm
+    · exact subset_of_union_eq_of_disjoint A B C hA h
+    · exact subset_of_union_eq_of_disjoint B A C hB (id (Eq.symm h))
+  · intro h
+    rw [h]
+
+-- it is not clear whether I should be defining `Subgroup.noncenter`
+-- or trying an alternative formalization
+-- argument is symmetric, surely there must be a tactic for such cases
+lemma conj_eq_conj_iff {G : Type*} [Group G] {c c' : G} (H : Subgroup G) :
+    conj c • H.noncenter = conj c' • H.noncenter ↔ conj c • H = conj c' • H := by
+  -- have :=  conj_subgroup_eq_conj_center_union_conj_noncenter H c
+  suffices conj c • H.noncenter = conj c' • H.noncenter ↔ (conj c • H : Set G) = conj c' • H by
+    simp [this]
+    constructor <;> intro h <;> ext x
+    · rw [mem_coe_conj_iff_conj_coe, mem_coe_conj_iff_conj_coe, h]
+    · rw [← mem_coe_conj_iff_conj_coe, ← mem_coe_conj_iff_conj_coe, h]
+  rw [conj_subgroup_eq_conj_center_union_conj_noncenter]
+  have key₁ : conj c • (center G ⊓ H) = center G ⊓ H := Subgroup.Normal.conj_smul_eq_self c _
+  norm_cast
+  rw [key₁]
+  push_cast
+  rw [conj_subgroup_eq_conj_center_union_conj_noncenter]
+  have key₂ : conj c' • (center G ⊓ H) = center G ⊓ H := Subgroup.Normal.conj_smul_eq_self c' _
+  norm_cast
+  rw [key₂]
+  symm
+  rw [eq_iff_union_eq_of_disjoint _ _]
+  · rw [disjoint_comm, disjoint_iff, eq_bot_iff, ← key₁]
+    intro x ⟨x_mem_center, x_mem_conj⟩
+    simp [Subgroup.noncenter] at x_mem_conj
+    push_cast at x_mem_center
+    rw [Set.mem_smul_set_iff_inv_smul_mem] at x_mem_conj x_mem_center
+    rw [Set.mem_diff] at x_mem_conj
+    suffices (conj c)⁻¹ • x ∈ center G by
+      absurd x_mem_conj.right
+      exact this
+    apply Set.inter_subset_left
+    apply x_mem_center
+  · sorry
+
+
+lemma Bijective_ConjClassOf_to_noncenter_ConjClassOf {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) : Bijective (ConjClassOf_to_noncenter_ConjClassOf G A) := by
+  refine ⟨?Injective, ?Surjective⟩
+  · intro conj_A conj_B hAB
+    obtain ⟨c, c_mem_G, conj_A_eq⟩ := conj_A.prop
+    obtain ⟨c', c'_mem_G, conj_B_eq⟩ := conj_B.prop
+    simp [ConjClassOf_to_noncenter_ConjClassOf] at hAB
+    rw [← conj_A_eq, ← conj_B_eq, conj_noncenter_eq_noncenter_conj,
+      conj_noncenter_eq_noncenter_conj] at hAB
+    rw [conj_eq_conj_iff] at hAB
+    apply Subtype.ext
+    rw [← conj_A_eq, ← conj_B_eq, hAB]
+  · intro ⟨A_noncenter, c, c_mem_G, conj_A_noncenter_eq⟩
+    use ⟨conj c • A, by simp [ConjClassOf]; use c⟩
+    simp [ConjClassOf_to_noncenter_ConjClassOf, ← conj_A_noncenter_eq]
+    exact conj_noncenter_eq_noncenter_conj A c
+
+
+#check Function.Bijective
 /-
 Theorem 2.4 ii)
 $|\mathcal{C}_i| = |\mathcal{C}_i^*|$
 -/
 lemma card_noncenter_ConjClassOfSet_eq_card_ConjClassOfSet {F : Type*} [Field F] (G : Subgroup SL(2,F))
   (A : MaximalAbelianSubgroupsOf G) :
-    Nat.card (ConjClassOfSet G A) =
-    Nat.card (noncenter_ConjClassOfSet G (
+    Nat.card (ConjClassOf G A) =
+    Nat.card (noncenter_ConjClassOf G (
       ⟨noncenter A, noncenter_mem_noncenter_MaximalAbelianSubgroupsOf G A⟩
     )) := by
-  apply Nat.card_eq_of_bijective sorry
-  sorry
+  exact Nat.card_eq_of_bijective _ (Bijective_ConjClassOf_to_noncenter_ConjClassOf G A)
 
+
+noncomputable def conjClassOf_to_G {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) : ConjClassOf G A → G :=
+  fun ⟨_, h⟩ => ⟨h.choose, h.choose_spec.left⟩
+
+def conjClassOf_to_quot_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) : ConjClassOf G A → G ⧸ ((A.val.subgroupOf G).normalizer) := sorry
 /-
 Theorem 2.4 iii)
 $|\mathcal{C}_i| = [G : N_G(A_i)]$
 -/
-lemma card_ConjClassOfSet_eq_index_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
+lemma card_ConjClassOf_eq_index_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
   (A : MaximalAbelianSubgroupsOf G) :
-  Nat.card (ConjClassOfSet G A) = index (normalizer (A.val.subgroupOf G)) := by sorry
+    Nat.card (ConjClassOf G A) = index (normalizer (A.val.subgroupOf G)) := by
+
+  sorry
 
 noncomputable instance {F : Type*} [Field F] {G : Subgroup SL(2,F)} [Finite G] :
   Fintype (Quotient (lift_MaximalAbelianSubgroupsOf G)) := by infer_instance
@@ -680,8 +832,6 @@ the setNormalizer needs to be restricted to G
 -- noncomputable def lift_index_normalizer {F : Type*} [Field F] {G : Subgroup SL(2,F)} [Finite G] :=
 --   @Quotient.lift _ _ (s := lift_noncenter_MaximalAbelianSubgroupsOf G)
 --     (fun (A_star : noncenter_MaximalAbelianSubgroupsOf G) => index (setNormalizer (A_star.val)))
-
-
 
 /-
 Theorem 2.4 iv)

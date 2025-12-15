@@ -12,9 +12,6 @@
 
 \documentclass[a4paper]{report}
 
-% \usepackage{expl3}
-
-% \usepackage[utf8]{inputenc}
 \usepackage[textwidth=14cm]{geometry}
 \usepackage{xfrac}
 \usepackage{polyglossia}
@@ -25,13 +22,14 @@
 \usepackage[pdfencoding=auto, psdextra]{hyperref}
 
 \usepackage{tikz-cd}
-% \usepackage{minted}
 
 \usepackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
 \usepackage{fontspec}
-% \setmainfont{DejaVu Serif}
 \setmathfont{latinmodern-math.otf}
-
+\setmathfont[range=\varnothing]{Asana-Math.otf}
+\setmathfont[range=\pitchfork]{Asana-Math.otf}
+\setmathfont[range=\intprod]{Asana-Math.otf}
+\setmathfont[range=\int]{latinmodern-math.otf}
 
 \usepackage[nameinlink, capitalize]{cleveref}
 
@@ -40,9 +38,6 @@
 \usepackage{amsthm}
 \usepackage{etexcmds}
 \usepackage{thmtools}
-% pdf version can use minted - we define code environment which uses minted for the pdf
-% \usepackage{minted}
-\usepackage{tikz}
 
 \input{preamble/print}
 

@@ -1070,7 +1070,7 @@ theorem A_eq_Q_join_Z_of_IsConj_s_or_neg_s {F : Type*} [Field F]
       symm
       rw [← nontrivial_iff_ne_bot]
       exact nontrivial_Q_subgroupOf_G
-    have IsPGroup_Q_subgroupOf_G:=
+    have IsPGroup_Q_subgroupOf_G :=
       @IsPGroup
         G _ p hp'.out (Q.subgroupOf G) _ IsElementaryAbelian_Q_subgroupOf_G bot_lt_Q_subgroupOf_G
     have exists_Sylow := @IsPGroup.exists_le_sylow p G _ (Q.subgroupOf G) IsPGroup_Q_subgroupOf_G
@@ -1798,6 +1798,10 @@ def monoidHom_normalizer_D_quot_D {F : Type*} [Field F] (A' G' : Subgroup SL(2,F
     simpa [MonoidHom.mem_ker, QuotientGroup.eq_one_iff] using hx
     )
 
+
+noncomputable def foob {F : Type*} [Field F] (A' G' : Subgroup SL(2,F)) :=
+  QuotientGroup.quotientInfEquivProdNormalQuotient (H := (((A'.normalizer ⊓ G')).subgroupOf ((D F).normalizer)))
+        (N := (D F).subgroupOf ((D F).normalizer))
 
 noncomputable def A_subgroupOf_G_MonoidHom_ZMod_two {F : Type*} [Field F] (A' G' : Subgroup SL(2,F))
   (A'_le_D : A' ≤ D F) (A'_le_G' : A' ≤ G') (two_lt_card_A' : 2 < Nat.card A')
