@@ -738,6 +738,22 @@ lemma eq_iff_union_eq_of_disjoint {G : Type*} (A B C: Set G) (hA : Disjoint A C)
   · intro h
     rw [h]
 
+theorem Disjoint_conj_noncenter_center {G : Type*} [inst : Group G]
+  {c : G} (H : Subgroup G) (key : conj c • (center G ⊓ H) = center G ⊓ H)  :
+  Disjoint (conj c • H.noncenter) ↑(center G ⊓ H) := by
+  rw [disjoint_comm, disjoint_iff, eq_bot_iff, ← key]
+  intro x ⟨x_mem_center, x_mem_conj⟩
+  simp [Subgroup.noncenter] at x_mem_conj
+  push_cast at x_mem_center
+  rw [Set.mem_smul_set_iff_inv_smul_mem] at x_mem_conj x_mem_center
+  rw [Set.mem_diff] at x_mem_conj
+  suffices (conj c)⁻¹ • x ∈ center G by
+    absurd x_mem_conj.right
+    exact this
+  apply Set.inter_subset_left
+  apply x_mem_center
+
+
 -- it is not clear whether I should be defining `Subgroup.noncenter`
 -- or trying an alternative formalization
 -- argument is symmetric, surely there must be a tactic for such cases
@@ -760,18 +776,8 @@ lemma conj_eq_conj_iff {G : Type*} [Group G] {c c' : G} (H : Subgroup G) :
   rw [key₂]
   symm
   rw [eq_iff_union_eq_of_disjoint _ _]
-  · rw [disjoint_comm, disjoint_iff, eq_bot_iff, ← key₁]
-    intro x ⟨x_mem_center, x_mem_conj⟩
-    simp [Subgroup.noncenter] at x_mem_conj
-    push_cast at x_mem_center
-    rw [Set.mem_smul_set_iff_inv_smul_mem] at x_mem_conj x_mem_center
-    rw [Set.mem_diff] at x_mem_conj
-    suffices (conj c)⁻¹ • x ∈ center G by
-      absurd x_mem_conj.right
-      exact this
-    apply Set.inter_subset_left
-    apply x_mem_center
-  · sorry
+  · exact Disjoint_conj_noncenter_center H key₁
+  · exact Disjoint_conj_noncenter_center H key₂
 
 
 lemma Bijective_ConjClassOf_to_noncenter_ConjClassOf {F : Type*} [Field F] (G : Subgroup SL(2,F))
@@ -797,8 +803,8 @@ lemma Bijective_ConjClassOf_to_noncenter_ConjClassOf {F : Type*} [Field F] (G : 
 Theorem 2.4 ii)
 $|\mathcal{C}_i| = |\mathcal{C}_i^*|$
 -/
-lemma card_noncenter_ConjClassOfSet_eq_card_ConjClassOfSet {F : Type*} [Field F] (G : Subgroup SL(2,F))
-  (A : MaximalAbelianSubgroupsOf G) :
+lemma card_noncenter_ConjClassOfSet_eq_card_ConjClassOfSet {F : Type*} [Field F]
+  (G : Subgroup SL(2,F)) (A : MaximalAbelianSubgroupsOf G) :
     Nat.card (ConjClassOf G A) =
     Nat.card (noncenter_ConjClassOf G (
       ⟨noncenter A, noncenter_mem_noncenter_MaximalAbelianSubgroupsOf G A⟩
@@ -810,8 +816,127 @@ noncomputable def conjClassOf_to_G {F : Type*} [Field F] (G : Subgroup SL(2,F))
   (A : MaximalAbelianSubgroupsOf G) : ConjClassOf G A → G :=
   fun ⟨_, h⟩ => ⟨h.choose, h.choose_spec.left⟩
 
-def conjClassOf_to_quot_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
-  (A : MaximalAbelianSubgroupsOf G) : ConjClassOf G A → G ⧸ ((A.val.subgroupOf G).normalizer) := sorry
+def G_to_ConjClassOf {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) : G → ConjClassOf G A :=
+  fun ⟨c, hc⟩ => ⟨conj c • A.val, by use c⟩
+
+-- For Mathlib
+lemma conj_eq_of_mem {G : Type*} [Group G] {H : Subgroup G} {h : G} (hh : h ∈ H) :
+    conj h • H = H := by
+  apply le_antisymm (conj_smul_le_of_le (le_refl H) ⟨h, hh⟩)
+  rw [subset_pointwise_smul_iff, ← map_inv]
+  exact conj_smul_le_of_le (le_refl H) ⟨h⁻¹, H.inv_mem hh⟩
+
+#check lift_MaximalAbelianSubgroupsOf
+
+def G_to_ConjClassOf_lift  {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) : G ⧸ ((A.val.subgroupOf G).normalizer) → ConjClassOf G A :=
+  Quot.lift (G_to_ConjClassOf G A)
+  (by
+  intro ⟨c, c_mem_G⟩ ⟨c', c'_mem_G⟩ h
+  symm at h
+  rw [QuotientGroup.leftRel_apply, mem_normalizer_iff] at h
+  simp [G_to_ConjClassOf]
+  rw [@conj_eq_iff_eq_conj_inv, smul_smul, ← map_mul]
+  ext x; constructor
+  · intro hx
+    specialize h ⟨x, A.prop.right hx⟩
+    simp [mem_subgroupOf] at h
+    simp [mem_pointwise_smul_iff_inv_smul_mem]
+    group at h ⊢
+    apply h.mp hx
+  · intro hx
+    simp [mem_pointwise_smul_iff_inv_smul_mem] at hx
+    have x_mem_G := A.prop.right hx
+    rw [show c'⁻¹ * (c * x * c⁻¹) * c' = (conj (c⁻¹ * c'))⁻¹ • x by simp,
+      ← mem_pointwise_smul_iff_inv_smul_mem] at x_mem_G
+    suffices conj (c⁻¹ * c') • G = G by
+      rw [this] at x_mem_G
+      specialize h ⟨x, x_mem_G⟩
+      simp [mem_subgroupOf] at h
+      group at h hx
+      apply h.mpr hx
+    exact conj_eq_of_mem (G.mul_mem (G.inv_mem c_mem_G) c'_mem_G))
+
+
+lemma Bijective_G_to_ConjClassOf_lift {F : Type*} [Field F] (G : Subgroup SL(2,F))
+  (A : MaximalAbelianSubgroupsOf G) : Bijective (G_to_ConjClassOf_lift G A) := by
+  refine ⟨?Injective, ?Surjective⟩
+  · rintro ⟨x, hx⟩ ⟨y, hy⟩ hxy
+    simp [G_to_ConjClassOf_lift] at hxy
+    rw [Subtype.ext_iff] at hxy
+    rw [Subtype.coe_eq_iff] at hxy
+    obtain ⟨⟨c, c_mem_G, hc⟩, h⟩ := hxy
+    simp_rw [← hc] at h
+    rw [Quot.eq]
+    sorry
+  · dsimp [G_to_ConjClassOf_lift]
+    rw [Quot.surjective_lift]
+    intro ⟨conj_A, c, c_mem_G, conj_A_eq⟩
+    use ⟨c, c_mem_G⟩
+    simp [G_to_ConjClassOf, ← conj_A_eq]
+
+
+-- noncomputable def conjClassOf_to_quot_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
+--   (A : MaximalAbelianSubgroupsOf G) : ConjClassOf G A → G ⧸ ((A.val.subgroupOf G).normalizer) :=
+--   fun conj_A => Quot.mk ⇑(QuotientGroup.leftRel ((A.val.subgroupOf G).normalizer)) ⟨_, conj_A.prop.choose_spec.left⟩
+
+
+
+-- lemma Bijective_conjClassOf_to_quot_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
+--   (A : MaximalAbelianSubgroupsOf G) : Bijective (conjClassOf_to_quot_normalizer G A) := by
+--   refine ⟨?Injective, ?Surjective⟩
+--   · intro conj_A conj_B h
+--     simp [conjClassOf_to_quot_normalizer] at h
+--     have ⟨c_mem_G, conj_A_eq⟩ := conj_A.prop.choose_spec
+--     have ⟨c'_mem_G, conj_B_eq⟩ := conj_B.prop.choose_spec
+--     set c := conj_A.prop.choose with hc
+--     set c' := conj_B.prop.choose with hc'
+--     simp_rw [← hc, ← hc'] at h
+--     apply Subtype.ext
+--     rw [← conj_A_eq, ← conj_B_eq]
+--     symm at h
+--     rw? at h
+--     simp [Quot.eq, mem_normalizer_iff] at h
+--     rw [conj_eq_iff_eq_conj_inv, smul_smul, ← map_mul]
+--     ext x; constructor
+--     · intro hx
+--       simp [mem_pointwise_smul_iff_inv_smul_mem]
+--       specialize h x (A.prop.right hx)
+--       simp [mem_subgroupOf] at h
+--       group at h ⊢
+--       apply h.mp hx
+--     · intro hx
+--       simp [mem_pointwise_smul_iff_inv_smul_mem] at hx
+--       have x_mem_G := A.prop.right hx
+--       rw [show c'⁻¹ * (c * x * c⁻¹) * c' = (conj (c⁻¹ * c'))⁻¹ • x by simp,
+--         ← mem_pointwise_smul_iff_inv_smul_mem] at x_mem_G
+--       suffices conj (c⁻¹ * c') • G = G by
+--         rw [this] at x_mem_G
+--         specialize h x x_mem_G
+--         simp [mem_subgroupOf] at h
+--         group at h hx
+--         apply h.mpr hx
+--       exact conj_eq_of_mem (G.mul_mem (G.inv_mem c_mem_G) c'_mem_G)
+--   · intro c_normalizer
+--     obtain ⟨c, hc⟩ := c_normalizer
+--     use ⟨conj c • A.val, by use c⟩
+--     simp [conjClassOf_to_quot_normalizer]
+--     let conj_A : ConjClassOf G A := ⟨conj c • A, by use c⟩
+--     set c' := conj_A.prop.choose with hc'
+--     simp_rw [← hc']
+
+
+
+
+
+--     -- rw [QuotientGroup.eq]
+
+--     -- rw [QuotientGroup.eq_iff_div_mem]
+
+
+--     sorry
+
 /-
 Theorem 2.4 iii)
 $|\mathcal{C}_i| = [G : N_G(A_i)]$
@@ -819,7 +944,6 @@ $|\mathcal{C}_i| = [G : N_G(A_i)]$
 lemma card_ConjClassOf_eq_index_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
   (A : MaximalAbelianSubgroupsOf G) :
     Nat.card (ConjClassOf G A) = index (normalizer (A.val.subgroupOf G)) := by
-
   sorry
 
 noncomputable instance {F : Type*} [Field F] {G : Subgroup SL(2,F)} [Finite G] :

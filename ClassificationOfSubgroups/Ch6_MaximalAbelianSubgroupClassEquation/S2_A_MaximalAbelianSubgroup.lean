@@ -407,7 +407,6 @@ lemma eq_center_of_card_le_two {p : ℕ} [Fact (Nat.Prime p)] {F : Type*} [Field
 
 
 
-
 /- Theorem 2.3 (i) If x ∈ G\Z then we have CG (x) ∈ M. -/
 theorem centralizer_meet_G_in_MaximalAbelianSubgroups_of_noncentral {F : Type*} [Field F]
   [IsAlgClosed F] [DecidableEq F] (G : Subgroup SL(2,F)) (x : SL(2,F))
@@ -1552,7 +1551,6 @@ theorem A_subgroupOf_normalizer_MulEquiv_conj_A_subgroupOf_conj_quot_eq
 lemma conj_A_subgroupOf_G_eq_A'_subgroupOf_G {F : Type*} [Field F] {A A' G G' : Subgroup SL(2,F)} {c : SL(2,F)}
   (A_eq_conj_A' : A = conj c • A') (G_eq_conj_G' : G = conj c • G') :
     conj c • Subgroup.map G.subtype (A.subgroupOf G).normalizer = Subgroup.map G'.subtype (A'.subgroupOf G').normalizer := by
-  -- apply?
   sorry
 
 lemma conj_eq_iff_eq_conj_inv {F : Type*} [Field F] {c : SL(2,F)} (A A' : Subgroup SL(2,F)) :
@@ -1799,9 +1797,7 @@ def monoidHom_normalizer_D_quot_D {F : Type*} [Field F] (A' G' : Subgroup SL(2,F
     )
 
 
-noncomputable def foob {F : Type*} [Field F] (A' G' : Subgroup SL(2,F)) :=
-  QuotientGroup.quotientInfEquivProdNormalQuotient (H := (((A'.normalizer ⊓ G')).subgroupOf ((D F).normalizer)))
-        (N := (D F).subgroupOf ((D F).normalizer))
+
 
 noncomputable def A_subgroupOf_G_MonoidHom_ZMod_two {F : Type*} [Field F] (A' G' : Subgroup SL(2,F))
   (A'_le_D : A' ≤ D F) (A'_le_G' : A' ≤ G') (two_lt_card_A' : 2 < Nat.card A')
@@ -1830,7 +1826,29 @@ noncomputable def A_subgroupOf_G_MonoidHom_ZMod_two {F : Type*} [Field F] (A' G'
     = ((D F).subgroupOf (D F).normalizer).subgroupOf
         ((A'.normalizer ⊓ G').subgroupOf
           (D F).normalizer ⊔ (D F).subgroupOf (D F).normalizer) by
-    sorry)
+    dsimp [φ₃]
+    ext x; constructor
+    · intro hx
+      rw [mem_map] at hx
+      obtain ⟨y, y_mem_subgroupOf, hy⟩ := hx
+      rw [← hy]
+      rw [mem_subgroupOf, mem_subgroupOf] at y_mem_subgroupOf ⊢
+      simp [y_mem_subgroupOf]
+    · intro hx
+      rw [mem_map]
+      use ⟨
+        x.val,
+        by
+        rw [mem_subgroupOf, mem_subgroupOf] at hx
+        rw [mem_subgroupOf]
+        suffices D F ≤ A'.normalizer ⊓ G' ⊔ D F by
+          apply this hx
+        apply le_sup_right
+        ⟩
+      constructor
+      · rw [mem_subgroupOf, mem_subgroupOf] at hx ⊢
+        simp [hx]
+      · aesop)
 
   let ϕ₄ := monoidHom_normalizer_D_quot_D A' G'
 
@@ -1861,11 +1879,6 @@ lemma injective_A_subgroupOf_G_MonoidHom_ZMod_two {F : Type*} [Field F] (A' G' :
   · exact MulEquiv.injective _
   exact MulEquiv.injective _
 
-#check MonoidHom.comp
-
-#check Equiv.ofInjective
-
-#check Equiv.mulEquiv
 
 lemma relIndex_MaximalAbelianSubgroupOf_normalizer_eq_relIndex_conj_MaxAbelianSubgroupOf
   {F : Type*} [Field F] {A A' G G' : Subgroup SL(2,F)} {c : SL(2,F)}
