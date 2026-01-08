@@ -1,5 +1,10 @@
 import ClassificationOfSubgroups.Ch5_PropertiesOfSLOverAlgClosedField.S2_SpecialSubgroups
-import Mathlib
+import Mathlib.Algebra.GroupWithZero.Conj
+import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.RingTheory.Artinian.Instances
+import Mathlib.RingTheory.FiniteLength
+import Mathlib.RingTheory.PicardGroup
+import Mathlib.RingTheory.SimpleRing.Principal
 
 set_option autoImplicit false
 set_option linter.style.longLine true

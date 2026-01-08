@@ -1,5 +1,4 @@
 import ClassificationOfSubgroups.Ch5_PropertiesOfSLOverAlgClosedField.S3_JordanNormalFormOfSL
-import Mathlib
 
 set_option autoImplicit false
 set_option linter.style.longLine true

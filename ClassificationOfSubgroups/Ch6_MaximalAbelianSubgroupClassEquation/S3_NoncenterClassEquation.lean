@@ -1,7 +1,5 @@
 import ClassificationOfSubgroups.Ch6_MaximalAbelianSubgroupClassEquation.S2_A_MaximalAbelianSubgroup
-import ClassificationOfSubgroups.Ch6_MaximalAbelianSubgroupClassEquation.S2_B_MaximalAbelianSubgroup
-
-import Mathlib
+import Mathlib.Data.Setoid.Partition
 
 set_option linter.style.longLine true
 set_option autoImplicit false
@@ -84,7 +82,7 @@ def Partition_lift_noncenter_MaximalAbelianSubgroupsOf {F : Type*} [Field F] (G 
 
 #check Setoid.IsPartition.sUnion_eq_univ
 
-#check sUnion_memPartition
+-- #check sUnion_memPartition
 
 #check Set
 /-
@@ -607,9 +605,9 @@ lemma card_noncenter_C_eq_noncenter_MaximalAbelianSubgroup_mul_noncenter_ConjCla
 
   sorry
 
-#check Group.nat_card_center_add_sum_card_noncenter_eq_card
+-- #check Group.nat_card_center_add_sum_card_noncenter_eq_card
 
-#check Group.card_center_add_sum_card_noncenter_eq_card
+-- #check Group.card_center_add_sum_card_noncenter_eq_card
 
 
 -- lemma card_noncenter_C_eq_of_related {F : Type*} [Field F] (G : Subgroup SL(2,F)) [Finite G] :
@@ -667,29 +665,6 @@ def ConjClassOf_to_noncenter_ConjClassOf {F : Type*} [Field F] (G : Subgroup SL(
   ⟩
 
 open Function
-
-#check Set.image_union
-#check Set.union_diff_cancel
-
-instance semiring {X : Type*} : Semiring (Set X) where
-  add s t := Set.union s t
-  add_assoc s t r := Set.union_assoc _ _ _
-  zero := ⊥
-  zero_add s := Set.empty_union _
-  add_zero := Set.union_empty
-  nsmul n s := sorry --⋃₀ i : Fin n, s
-  add_comm := Set.union_comm
-  mul s t := Set.inter s t
-  left_distrib := Set.inter_union_distrib_left
-  right_distrib := Set.union_inter_distrib_right
-  zero_mul := Set.empty_inter
-  mul_zero := Set.inter_empty
-  mul_assoc := Set.inter_assoc
-  one := ⊤
-  one_mul := Set.univ_inter
-  mul_one := Set.inter_univ
-  nsmul_zero := sorry
-  nsmul_succ := sorry
 
 
 lemma conj_subgroup_eq_conj_center_union_conj_noncenter {G : Type*} [Group G] (H : Subgroup G)
@@ -798,7 +773,6 @@ lemma Bijective_ConjClassOf_to_noncenter_ConjClassOf {F : Type*} [Field F] (G : 
     exact conj_noncenter_eq_noncenter_conj A c
 
 
-#check Function.Bijective
 /-
 Theorem 2.4 ii)
 $|\mathcal{C}_i| = |\mathcal{C}_i^*|$
@@ -827,7 +801,6 @@ lemma conj_eq_of_mem {G : Type*} [Group G] {H : Subgroup G} {h : G} (hh : h ∈ 
   rw [subset_pointwise_smul_iff, ← map_inv]
   exact conj_smul_le_of_le (le_refl H) ⟨h⁻¹, H.inv_mem hh⟩
 
-#check lift_MaximalAbelianSubgroupsOf
 
 def G_to_ConjClassOf_lift  {F : Type*} [Field F] (G : Subgroup SL(2,F))
   (A : MaximalAbelianSubgroupsOf G) : G ⧸ ((A.val.subgroupOf G).normalizer) → ConjClassOf G A :=
@@ -837,7 +810,7 @@ def G_to_ConjClassOf_lift  {F : Type*} [Field F] (G : Subgroup SL(2,F))
   symm at h
   rw [QuotientGroup.leftRel_apply, mem_normalizer_iff] at h
   simp [G_to_ConjClassOf]
-  rw [@conj_eq_iff_eq_conj_inv, smul_smul, ← map_mul]
+  rw [conj_eq_iff_eq_conj_inv, smul_smul, ← map_mul]
   ext x; constructor
   · intro hx
     specialize h ⟨x, A.prop.right hx⟩
@@ -879,7 +852,8 @@ lemma Bijective_G_to_ConjClassOf_lift {F : Type*} [Field F] (G : Subgroup SL(2,F
 
 -- noncomputable def conjClassOf_to_quot_normalizer {F : Type*} [Field F] (G : Subgroup SL(2,F))
 --   (A : MaximalAbelianSubgroupsOf G) : ConjClassOf G A → G ⧸ ((A.val.subgroupOf G).normalizer) :=
---   fun conj_A => Quot.mk ⇑(QuotientGroup.leftRel ((A.val.subgroupOf G).normalizer)) ⟨_, conj_A.prop.choose_spec.left⟩
+--   fun conj_A => Quot.mk ⇑(QuotientGroup.leftRel ((A.val.subgroupOf G).normalizer))
+--  ⟨_, conj_A.prop.choose_spec.left⟩
 
 
 
@@ -896,7 +870,6 @@ lemma Bijective_G_to_ConjClassOf_lift {F : Type*} [Field F] (G : Subgroup SL(2,F
 --     apply Subtype.ext
 --     rw [← conj_A_eq, ← conj_B_eq]
 --     symm at h
---     rw? at h
 --     simp [Quot.eq, mem_normalizer_iff] at h
 --     rw [conj_eq_iff_eq_conj_inv, smul_smul, ← map_mul]
 --     ext x; constructor

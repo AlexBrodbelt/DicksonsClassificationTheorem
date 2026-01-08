@@ -1,13 +1,10 @@
 import ClassificationOfSubgroups.Ch4_PGLIsoPSLOverAlgClosedField.ProjectiveGeneralLinearGroup
 import ClassificationOfSubgroups.Ch6_MaximalAbelianSubgroupClassEquation.S2_A_MaximalAbelianSubgroup
-import ClassificationOfSubgroups.Ch6_MaximalAbelianSubgroupClassEquation.S2_B_MaximalAbelianSubgroup
 import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.GroupTheory.PresentedGroup
 import Mathlib.GroupTheory.SpecificGroups.Alternating
-import Mathlib.GroupTheory.QuotientGroup.Basic
+import Mathlib.GroupTheory.SpecificGroups.Dihedral
 import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Card
-import Mathlib.LinearAlgebra.Matrix.GeneralLinearGroup.Defs
 
 set_option linter.style.longLine true
 set_option maxHeartbeats 0

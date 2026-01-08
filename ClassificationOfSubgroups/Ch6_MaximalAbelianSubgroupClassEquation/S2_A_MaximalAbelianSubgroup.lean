@@ -1,7 +1,9 @@
 import ClassificationOfSubgroups.Ch5_PropertiesOfSLOverAlgClosedField.S4_PropertiesOfCentralizers
 import ClassificationOfSubgroups.Ch5_PropertiesOfSLOverAlgClosedField.S5_PropertiesOfNormalizers
 import ClassificationOfSubgroups.Ch6_MaximalAbelianSubgroupClassEquation.S1_ElementaryAbelian
-import Mathlib
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Data.Int.Star
+import Mathlib.FieldTheory.Finite.Basic
 
 set_option linter.style.longLine true
 set_option autoImplicit false
@@ -2006,3 +2008,5 @@ theorem index_normalizer_le_two {p : ℕ} [hp : Fact (Nat.Prime p)]
 
 
 end MaximalAbelianSubgroup
+
+#min_imports

@@ -15,8 +15,6 @@ lemma Nonempty_normalizer_A'_inf_G_diff_A' {F : Type*} [Field F] (A' G' : Subgro
   have : A'.normalizer ⊓ G' ≤ D F := by
     rw [normalizer_subgroup_D_eq_DW sorry sorry]
     sorry
-
-
   sorry
 /-
 Theorem 2.3 (iv b) Furthermore, if [NG (A) : A] = 2,
